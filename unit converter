@@ -1,0 +1,20 @@
+const unite converter ={
+m:1,
+km:1000,
+cm:0.01,
+mm:0.001,
+in:0.254,
+ft:0.3048,
+yd:0.9144,
+mi:1609.34
+};
+function convert (value,formatunite,tounite)
+const unites=unitconverter;
+const valueinmeters= value*unite{fromunit}
+const result = valueinmeters / unite{tounit}
+return result:
+}
+console.log(convert(5,"ft","m"));
+console.log (convert(100,"km","m"))
+
+
