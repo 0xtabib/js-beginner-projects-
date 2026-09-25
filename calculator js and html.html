@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Password Generator</title>
     <style>
-        /* Minimalist CSS to make it look clean and centered */
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f9;
@@ -15,7 +14,6 @@
             height: 100vh;
             margin: 0;
         }
-
         .card {
             background-color: white;
             padding: 30px;
@@ -25,11 +23,9 @@
             max-width: 300px;
             width: 100%;
         }
-
         .length-control {
             margin-bottom: 15px;
         }
-
         input[type="number"] {
             width: 50px;
             padding: 5px;
@@ -45,11 +41,9 @@ button {
             cursor: pointer;
             transition: 0.2s;
         }
-
         button:hover {
             background-color: #218838;
         }
-
         #password-display {
             margin-top: 20px;
             padding: 15px;
@@ -64,10 +58,8 @@ button {
     </style>
 </head>
 <body>
-
     <div class="card">
         <h2>Password Generator</h2>
-        
         <div class="length-control">
             <label for="pwd-length">Length: </label>
             <input type="number" id="pwd-length" value="12" min="1" max="50">
@@ -77,9 +69,7 @@ button {
 
         <div id="password-display">...</div>
     </div>
-
     <script>
-        // Your exact working function
         function generatepassword(length) {
             const characters = "ASFDGYEYTDFERXVDTED34537643689/*/$%.........";
             let password = "";
@@ -88,22 +78,13 @@ button {
                 const randomIndex = Math.floor(Math.random() * characters.length);
                 password += characters[randomIndex];
             }
-            
             return password;
         }
-
-        // New function to connect your code to the HTML buttons
         function generateAndDisplay() {
-            // 1. Get the length typed into the input box
             const lengthInput = document.getElementById("pwd-length").value;
-            
-            // 2. Generate the password using your function
-            const newPassword = generatepassword(lengthInput);
-            
-            // 3. Show the new password inside the display box
+            const newPassword = generatepassword(lengthInput)
             document.getElementById("password-display").innerText = newPassword;
         }
     </script>
-
 </body>
 </html>
