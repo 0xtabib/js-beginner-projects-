@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+
+        .calculator {
+            background: #2d2d2d;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 
+                0 10px 30px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .display {
+            background: #1a1a1a;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: flex-end;
+            overflow-x: auto;
+        }
+
+        .display .expression {
+            color: #6d757a;
+            font-size: 14px;
+            white-space: nowrap;
+            margin-bottom: 5px;
+            min-height: 20px;
+        }
+
+        .display .result {
+            color: #ffffff;
+            font-size: 36px;
+            font-weight: 300;
+            word-break: break-all;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        button {
+            border: none;
+            border-radius: 12px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        button.operator {
+            background: linear-gradient(145deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        button.operator:hover {
+            background: linear-gradient(145deg, #764ba2, #8b6cb0);
+        }
+
+        button.clear {
+            background: linear-gradient(145deg, #e94560, #f07a80);
+            color: white;
+        }
+
+        button.clear:hover {
+            background: linear-gradient(145deg, #f07a80, #ffaaaf);
+        }
+
+        button.equals {
+            background: linear-gradient(145deg, #00b894, #00cec9);
+            color: white;
+            grid-column: span 2;
+        }
+
+        button.equals:hover {
+            background: linear-gradient(145deg, #00cec9, #55efc4);
+        }
+
+        button.number {
+            background: #3d3d3d;
+            color: white;
+        }
+
+        button.number:hover {
+            background: #4d4d4d;
+        }
+
+        button.function {
+            background: #4a5568;
+            color: white;
+            font-size: 16px;
+        }
+
+        button.function:hover {
+            background: #5a6372;
+        }
+
+        @media (max-width: 400px) {
+            .display {
+                min-height: 60px;
+            }
+
+            .display .result {
+                font-size: 28px;
+            }
+
+            button {
+                padding: 15px;
+                font-size: 18px;
+            }
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0; }
+        }
+
+        .blinking-cursor {
+            animation: blink 1s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display" id="display">
+            <span class="expression" id="expression"></span>
+            <span class="result" id="result">0</span>
+        </div>
+        <div class="buttons">
+            <button class="function" data-action="clear">AC</button>
+            <button class="function" data-action="delete">DEL</button>
+            <button class="function" data-action="percent">%</button>
+            <button class="operator" data-value="/">/</button>
+
+            <button class="number" data-value="7">7</button>
+            <button class="number" data-value="8">8</button>
+            <button class="number" data-value="9">9</button>
+            <button class="operator" data-value="*">×</button>
+
+            <button class="number" data-value="4">4</button>
+            <button class="number" data-value="5">5</button>
+            <button class="number" data-value="6">6</button>
+            <button class="operator" data-value="-">-</button>
+
+            <button class="number" data-value="1">1</button>
+            <button class="number" data-value="2">2</button>
+            <button class="number" data-value="3">3</button>
+            <button class="operator" data-value="+">+</button>
+
+            <button class="number" data-value="0">0</button>
+            <button class="number" data-value=".">.</button>
+            <button class="equals" data-action="calculate">=</button>
+        </div>
+    </div>
+
+    <script>
+        class Calculator {
+            constructor() {
+                this.expressionElement = document.getElementById('expression');
+                this.resultElement = document.getElementById('result');
+                this.currentExpression = '';
+                this.previousResult = null;
+                
+                this.init();
+            }
+
+            init() {
+                // Get all buttons
+                const buttons = document.querySelectorAll('button');
+                
+                buttons.forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        this.handleButtonClick(e.target);
+                    });
+                });
+
+                // Keyboard support
+                document.addEventListener('keydown', (e) => {
+                    const key = e.key;
+                    
+                    if (!isNaN(key)) {
+                        this.addToExpression(key);
+                    } else if (key === '+' || key === '-' || key === '*' || key === '/' || key === '.') {
+                        const operatorMap = { '*': '×', '/': '/', '+': '+', '-': '-'};
+                        this.addToExpression(operatorMap[key] || key);
+                    } else if (key === 'Enter' || key === '=') {
+                        this.calculate();
+                    } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                        this.clear();
+                    } else if (key === 'Backspace') {
+                        this.delete();
+                    }
+                });
+
+                console.log('Calculator initialized!');
+            }
+
+            addToExpression(value) {
+                this.currentExpression += value;
+                this.updateDisplay();
+            }
+
+            handleButtonClick(target) {
+                const action = target.dataset.action;
+                const value = target.dataset.value;
+
+                switch (action) {
+                    case 'clear':
+                        this.clear();
+                        break;
+                    case 'delete':
+                        this.delete();
+                        break;
+                    case 'percent':
+                        if (this.currentExpression && !isNaN(this.currentExpression[this.currentExpression.length - 1])) {
+                            this.addToExpression('%');
+                        }
+                        break;
+                    case 'calculate':
+                        this.calculate();
+                        break;
+                    default:
+                        this.addToExpression(value);
+                }
+            }
+
+            clear() {
+                this.currentExpression = '';
+                this.previousResult = null;
+                this.updateDisplay();
+            }
+
+            delete() {
+                if (this.currentExpression.length > 0) {
+                    this.currentExpression = this.currentExpression.slice(0, -1);
+                    this.updateDisplay();
+                }
+            }
+
+            calculate() {
+                try {
+                    // Replace visual operators with JavaScript operators
+                    let evalString = this.currentExpression
+                        .replace('×', '*')
+                        .replace('/', '/');
+                    
+                    // Handle percentage
+                    evalString = evalString.replace(/(\d+(\.\d+)?)%/g, (match) => {
+                        return parseFloat(match) / 100;
+                    });
+
+                    // Calculate result
+                    const result = Function('"use strict";return (' + evalString + ')')();
+                    
+                    // Format result to avoid floating point issues
+                    if (typeof result === 'number') {
+                        const precision = Math.max(0, 14 - this.currentExpression.split('+').join('').split('-').join('').split('*').join('').split('/').join('').length);
+                        let formattedResult;
+                        
+                        if (!isFinite(result)) {
+                            formattedResult = 'Error';
+                        } else {
+                            formattedResult = parseFloat(result.toFixed(precision)).toString();
+                        }
+                        
+                        // Update display with visual operators
+                        const visualResult = formattedResult
+                            .replace(/\*/g, '×')
+                            .replace(/\//g, '/');
+                        
+                        this.currentExpression = visualResult;
+                        this.previousResult = result;
+                        this.updateDisplay();
+                    }
+                } catch (error) {
+                    this.currentExpression = '';
+                    this.updateDisplay();
+                    console.error('Calculation error:', error);
+                }
+            }
+
+            updateDisplay() {
+                this.expressionElement.textContent = this.currentExpression || '';
+                this.resultElement.textContent = this.previousResult !== null ? 
+                    parseFloat(this.previousResult.toFixed(10)).toString() : '0';
+            }
+        }
+
+        // Initialize calculator when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            new Calculator();
+        });
+    </script>
+</body>
+</html>
