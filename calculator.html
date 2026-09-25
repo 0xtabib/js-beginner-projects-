@@ -200,8 +200,8 @@
                 this.init();
             }
 
-            init() {
-                // Get all buttons
+            init() 
+        
                 const buttons = document.querySelectorAll('button');
                 
                 buttons.forEach(button => {
@@ -210,7 +210,7 @@
                     });
                 });
 
-                // Keyboard support
+                
                 document.addEventListener('keydown', (e) => {
                     const key = e.key;
                     
@@ -275,20 +275,20 @@
 
             calculate() {
                 try {
-                    // Replace visual operators with JavaScript operators
-                    let evalString = this.currentExpression
+            
+                    let evalString = this.currentExpressio
                         .replace('×', '*')
                         .replace('/', '/');
                     
-                    // Handle percentage
+            
                     evalString = evalString.replace(/(\d+(\.\d+)?)%/g, (match) => {
                         return parseFloat(match) / 100;
                     });
 
-                    // Calculate result
+        
                     const result = Function('"use strict";return (' + evalString + ')')();
                     
-                    // Format result to avoid floating point issues
+                    
                     if (typeof result === 'number') {
                         const precision = Math.max(0, 14 - this.currentExpression.split('+').join('').split('-').join('').split('*').join('').split('/').join('').length);
                         let formattedResult;
@@ -299,7 +299,7 @@
                             formattedResult = parseFloat(result.toFixed(precision)).toString();
                         }
                         
-                        // Update display with visual operators
+                        
                         const visualResult = formattedResult
                             .replace(/\*/g, '×')
                             .replace(/\//g, '/');
@@ -322,7 +322,7 @@
             }
         }
 
-        // Initialize calculator when DOM is loaded
+        
         document.addEventListener('DOMContentLoaded', () => {
             new Calculator();
         });
